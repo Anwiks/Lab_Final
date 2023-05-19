@@ -13,8 +13,8 @@ def set_window_center(window):
     window.geometry('{}x{}+{}+{}'.format(width, height, x, y))
 
 # Función para enviar el resultado al cliente
-def send_result_to_client(result):
-    client_address = ('<172.17.4.111>', 12345)  # Remplace <client_ip> por el ip del cliente
+def send_result_to_client(result, client_ip, client_port):
+    client_address = (client_ip, client_port)
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.connect(client_address)
         sock.sendall(result.encode())
@@ -23,7 +23,9 @@ def send_result_to_client(result):
 def execute_code():
     code = code_text.get('1.0', tk.END)
     result = subprocess.getoutput(code)
-    send_result_to_client(result)
+    client_ip = ip_entry.get()
+    client_port = int(port_entry.get())
+    send_result_to_client(result, client_ip, client_port)
 
 # Crear la ventana principal
 window = tk.Tk()
@@ -32,6 +34,18 @@ window.title("Enviar Código Ejecutado")
 # Crear un widget de desplazamiento de texto para ingresar el código
 code_text = scrolledtext.ScrolledText(window, width=80, height=20)
 code_text.pack()
+
+# Crear el campo de entrada para la dirección IP del cliente
+ip_label = tk.Label(window, text="Dirección IP del Cliente:")
+ip_label.pack()
+ip_entry = tk.Entry(window)
+ip_entry.pack()
+
+# Crear el campo de entrada para el puerto del cliente
+port_label = tk.Label(window, text="Puerto del Cliente:")
+port_label.pack()
+port_entry = tk.Entry(window)
+port_entry.pack()
 
 # Crear el botón para ejecutar y enviar el código
 execute_button = tk.Button(window, text="Ejecutar y Enviar Código", command=execute_code)
@@ -42,6 +56,7 @@ set_window_center(window)
 
 # Iniciar el bucle principal de la ventana
 window.mainloop()
+
 
 
 
